@@ -19,5 +19,8 @@ COPY . .
 # Устанавливаем зависимости Laravel
 RUN composer install --no-dev --optimize-autoloader
 
+# Открываем порт (Render слушает только на 10000)
+EXPOSE 10000
+
 # Запускаем Laravel сервер
 CMD ["php", "artisan", "serve", "--host=0.0.0.0", "--port=10000"]
