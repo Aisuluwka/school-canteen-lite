@@ -58,11 +58,50 @@ class RequestController extends Controller
 
         $order->menuItems()->attach($request->menu_items);
 
-        return redirect()->route('menu.index')->with('success', 'Заявка отправлена!');
+        return back()->with('success', 'Заявка отправлена!');
+
     }
 
     public function export()
 {
     return Excel::download(new OrdersExport, 'orders.xlsx');
 }
+
+
+// Страница: только форма "Сделать заказ"
+public function orderPage()
+{
+    $today = now()->dayOfWeekIso; // 1=Пн..7=Вс
+    $menuItems = MenuItem::where('day', $today)->get();
+    $menuToday = $menuItems->groupBy('type');
+
+    $classes = ClassModel::orderBy('name')->get();
+
+    return view('student_request.order', compact('menuToday', 'classes'));
+}
+
+// Страница: только "Шкала успеха"
+public function statsPage()
+{
+    $successStats = Order::select('class_id', DB::raw('COUNT(*) as total'))
+        ->groupBy('class_id')
+        ->orderByDesc('total')
+        ->with('class')
+        ->get();
+
+    return view('student_request.stats', compact('successStats'));
+}
+
+// Страница: только "Таблица заказов"
+public function ordersPage()
+{
+    $orders = Order::with(['class', 'menuItems'])->latest()->get();
+
+    foreach ($orders as $order) {
+        $order->total_price = $order->menuItems->sum('price');
+    }
+
+    return view('student_request.orders', compact('orders'));
+}
+
 }

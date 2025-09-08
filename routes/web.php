@@ -2,19 +2,25 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\RequestController;
-//use App\Exports\OrdersExport;
-//use Maatwebsite\Excel\Facades\Excel;
 
+// ГЛАВНАЯ (картинка + три раздела)
+Route::get('/', function () {
+    return view('home');
+})->name('home');
 
-Route::get('/export-orders', [RequestController::class, 'export'])->name('orders.export');
-
-Route::redirect('/', '/menu');
-
+// СТАРАЯ страница "всё на одной" — оставляем для подстраховки
 Route::get('/menu', [RequestController::class, 'index'])->name('menu.index');
+// Если хочешь, можешь оставить и POST на /menu, он тоже будет работать:
 Route::post('/menu', [RequestController::class, 'store'])->name('requests.store');
 
-//for excel exporting file
+// НОВЫЕ отдельные разделы
+Route::get('/order', [RequestController::class, 'orderPage'])->name('order.page');   // форма заказа
+// Дополнительно разрешим и POST /order (на одну и ту же обработку):
+Route::post('/order', [RequestController::class, 'store']); // без имени роута, чтобы не конфликтовал
 
-//Route::get('/export/orders', function () {
-    //return Excel::download(new OrdersExport, 'orders.xlsx');
-//})->name('orders.export');
+Route::get('/stats', [RequestController::class, 'statsPage'])->name('stats.page');   // шкала успеха
+Route::get('/orders', [RequestController::class, 'ordersPage'])->name('orders.page'); // таблица заказов
+
+// Экспорт Excel
+Route::get('/export-orders', [RequestController::class, 'export'])->name('orders.export');
+
