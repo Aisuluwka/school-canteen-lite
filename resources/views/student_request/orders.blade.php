@@ -15,7 +15,7 @@
 
         <a href="{{ route('orders.export') }}"
            target="_blank"
-           class="inline-block mb-4 px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700">
+           class="inline-block mb-4 px-4 py-2 bg-green-600 text-white rounded-lg shadow hover:bg-green-700 transition">
            📥 Скачать заказы в Excel
         </a>
 
@@ -28,22 +28,43 @@
                         <th class="border px-4 py-2">Блюда</th>
                         <th class="border px-4 py-2">Сумма</th>
                         <th class="border px-4 py-2">Дата и время</th>
+                        <th class="border px-4 py-2">Действия</th>
                     </tr>
                 </thead>
                 <tbody>
                     @foreach($orders as $order)
-                        <tr>
+                        <tr class="hover:bg-gray-50">
                             <td class="border px-4 py-2">{{ $order->student_name }}</td>
                             <td class="border px-4 py-2">{{ $order->class->name }}</td>
                             <td class="border px-4 py-2">
-                                <ul>
+                                <ul class="list-disc list-inside text-sm text-gray-700">
                                     @foreach($order->menuItems as $item)
                                         <li>{{ $item->name }} — {{ $item->price }} ₸</li>
                                     @endforeach
                                 </ul>
                             </td>
-                            <td class="border px-4 py-2 font-semibold">{{ $order->total_price }} ₸</td>
-                            <td class="border px-4 py-2">{{ $order->created_at->format('d.m.Y H:i') }}</td>
+                            <td class="border px-4 py-2 font-semibold text-gray-900">{{ $order->total_price }} ₸</td>
+                            <td class="border px-4 py-2 text-sm text-gray-600">{{ $order->created_at->format('d.m.Y H:i') }}</td>
+                            <td class="border px-4 py-2">
+                                <div class="flex gap-2">
+                                    {{-- Редактировать --}}
+                                    <a href="{{ route('orders.edit', $order) }}" 
+                                       class="inline-flex items-center gap-1 px-3 py-1.5 bg-yellow-400 text-gray-900 text-sm font-medium rounded-lg shadow hover:bg-yellow-500 transition">
+                                        ✏️ <span>Редактировать</span>
+                                    </a>
+                                    
+                                    {{-- Удалить --}}
+                                    <form action="{{ route('orders.destroy', $order) }}" method="POST" class="inline">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" 
+                                                onclick="return confirm('Удалить этот заказ?')" 
+                                                class="inline-flex items-center gap-1 px-3 py-1.5 bg-red-500 text-white text-sm font-medium rounded-lg shadow hover:bg-red-600 transition">
+                                            🗑️ <span>Удалить</span>
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
                         </tr>
                     @endforeach
                 </tbody>
@@ -52,3 +73,4 @@
     </div>
 </body>
 </html>
+

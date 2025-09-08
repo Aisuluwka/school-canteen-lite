@@ -104,4 +104,42 @@ public function ordersPage()
     return view('student_request.orders', compact('orders'));
 }
 
+// Форма редактирования
+public function edit(Order $order)
+{
+    $classes = ClassModel::orderBy('name')->get();
+    $menuToday = MenuItem::where('day', now()->dayOfWeekIso)->get()->groupBy('type');
+
+    return view('student_request.edit_order', compact('order', 'classes', 'menuToday'));
+}
+
+// Обновление заказа
+public function update(Request $request, Order $order)
+{
+    $request->validate([
+        'student_name' => 'required|string|max:255',
+        'class_id'     => 'required|exists:classes,id',
+        'menu_items'   => 'required|array|min:1',
+        'menu_items.*' => 'exists:menu_items,id',
+    ]);
+
+    $order->update([
+        'student_name' => $request->student_name,
+        'class_id'     => $request->class_id,
+    ]);
+
+    // обновляем выбранные блюда
+    $order->menuItems()->sync($request->menu_items);
+
+    return redirect()->route('orders.page')->with('success', 'Заказ обновлён!');
+}
+
+// Удаление заказа
+public function destroy(Order $order)
+{
+    $order->delete();
+    return redirect()->route('orders.page')->with('success', 'Заказ удалён!');
+}
+
+
 }

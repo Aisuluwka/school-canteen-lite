@@ -24,3 +24,7 @@ Route::get('/orders', [RequestController::class, 'ordersPage'])->name('orders.pa
 // Экспорт Excel
 Route::get('/export-orders', [RequestController::class, 'export'])->name('orders.export');
 
+// Управление заказами
+Route::get('/orders/{order}/edit', [RequestController::class, 'edit'])->name('orders.edit');
+Route::put('/orders/{order}', [RequestController::class, 'update'])->name('orders.update');
+Route::delete('/orders/{order}', [RequestController::class, 'destroy'])->name('orders.destroy');
