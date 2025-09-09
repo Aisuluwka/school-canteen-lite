@@ -21,7 +21,8 @@ WORKDIR /app
 COPY . .
 
 # Устанавливаем зависимости Laravel
-RUN composer install --no-dev --optimize-autoloader
+RUN composer install --optimize-autoloader
+
 
 # Генерируем ключ приложения (если надо)
 RUN php artisan key:generate --force
