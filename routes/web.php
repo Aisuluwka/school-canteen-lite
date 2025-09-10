@@ -2,6 +2,11 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\RequestController;
+use App\Http\Controllers\AIAdviceController;
+
+
+
+
 
 // ГЛАВНАЯ (картинка + три раздела)
 Route::get('/', function () {
@@ -28,3 +33,7 @@ Route::get('/export-orders', [RequestController::class, 'export'])->name('orders
 Route::get('/orders/{order}/edit', [RequestController::class, 'edit'])->name('orders.edit');
 Route::put('/orders/{order}', [RequestController::class, 'update'])->name('orders.update');
 Route::delete('/orders/{order}', [RequestController::class, 'destroy'])->name('orders.destroy');
+
+
+
+Route::get('/api/daily-advice', [AIAdviceController::class, 'daily'])->name('ai.daily');

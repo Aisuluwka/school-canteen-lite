@@ -19,6 +19,16 @@
             </div>
         @endif
 
+        {{-- СОВЕТ ДНЯ --}}
+        <section id="daily-advice" class="mb-6 p-4 rounded-xl border bg-gray-50 shadow">
+            <div class="flex items-center justify-between">
+                <h2 class="text-lg font-semibold">Совет дня от умной столовой</h2>
+                <button id="refreshAdvice" class="text-sm px-3 py-1 rounded border">Обновить</button>
+            </div>
+            <p id="adviceText" class="mt-2 text-gray-800">Загружаем совет…</p>
+            <p id="adviceMeta" class="mt-1 text-xs text-gray-500"></p>
+        </section>
+
         <div class="bg-white rounded shadow p-6">
             <form method="POST" action="{{ route('requests.store') }}">
                 @csrf
@@ -63,6 +73,7 @@
     </div>
 
     <script>
+        // Подсчёт суммы
         const checkboxes = document.querySelectorAll('input[type="checkbox"][data-price]');
         const totalPriceEl = document.getElementById('total-price');
         function updateTotal() {
@@ -72,6 +83,25 @@
         }
         checkboxes.forEach(cb => cb.addEventListener('change', updateTotal));
         updateTotal();
+
+        // Совет дня
+        async function fetchAdvice() {
+            const textEl = document.getElementById('adviceText');
+            const metaEl = document.getElementById('adviceMeta');
+            textEl.textContent = 'Загружаем совет…';
+            metaEl.textContent = '';
+            try {
+                const res = await fetch('/api/daily-advice');
+                const data = await res.json();
+                textEl.textContent = data.text;
+                const picks = (data.picks && data.picks.length) ? ` (например: ${data.picks.join(' + ')})` : '';
+                metaEl.textContent = `${data.weekday}${picks}`;
+            } catch (e) {
+                textEl.textContent = 'Сегодня отличное меню — выбирайте сбалансированно!';
+            }
+        }
+        document.getElementById('refreshAdvice').addEventListener('click', fetchAdvice);
+        fetchAdvice();
     </script>
 </body>
 </html>

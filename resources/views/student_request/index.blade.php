@@ -16,6 +16,16 @@
             </div>
         @endif
 
+        {{-- СОВЕТ ДНЯ --}}
+        <section id="daily-advice" class="mb-8 p-4 rounded-xl border bg-gray-50 shadow">
+          <div class="flex items-center justify-between">
+            <h2 class="text-lg font-semibold">Совет дня от умной столовой</h2>
+            <button id="refreshAdvice" class="text-sm px-3 py-1 rounded border">Обновить</button>
+          </div>
+          <p id="adviceText" class="mt-2 text-gray-800">Загружаем совет…</p>
+          <p id="adviceMeta" class="mt-1 text-xs text-gray-500"></p>
+        </section>
+
         <form method="POST" action="{{ route('requests.store') }}">
             @csrf
 
@@ -76,13 +86,11 @@
         </table>
 
         <a href="{{ route('orders.export') }}" 
-   target="_blank"
-   class="inline-block mb-4 px-4 py-2 bg-green-600 text-white rounded 
-          hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 transition">
-   📥 Скачать заказы в Excel
-</a>
-
-
+           target="_blank"
+           class="inline-block mb-4 px-4 py-2 bg-green-600 text-white rounded 
+                  hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 transition">
+           📥 Скачать заказы в Excel
+        </a>
 
         {{-- ТАБЛИЦА ЗАКАЗОВ --}}
         <h2 class="text-xl font-bold mb-4">📋 Таблица заказов</h2>
@@ -138,8 +146,30 @@
         checkboxes.forEach(cb => {
             cb.addEventListener('change', updateTotal);
         });
-
         updateTotal();
+
+        // Скрипт для «Совета дня»
+        async function fetchAdvice() {
+          const textEl = document.getElementById('adviceText');
+          const metaEl = document.getElementById('adviceMeta');
+
+          textEl.textContent = 'Загружаем совет…';
+          metaEl.textContent = '';
+
+          try {
+            const res = await fetch('/api/daily-advice');
+
+            //const res = await fetch('{{ route('ai.daily') }}');
+            const data = await res.json();
+            textEl.textContent = data.text;
+            const picks = (data.picks && data.picks.length) ? ` (например: ${data.picks.join(' + ')})` : '';
+            metaEl.textContent = `${data.weekday}${picks}`;
+          } catch (e) {
+            textEl.textContent = 'Сегодня отличное меню — выбирайте сбалансированно!';
+          }
+        }
+        document.getElementById('refreshAdvice').addEventListener('click', fetchAdvice);
+        fetchAdvice();
     </script>
 </body>
 </html>
